@@ -31,6 +31,38 @@ const timeSlots = [
 
 const VolunteerRegistration = () => {
   const [selectedTransport, setSelectedTransport] = useState(null);
+  const [location, setLocation] = useState("");
+
+  const handleFindLocation = async () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`
+          );
+          const data = await response.json();
+          if (data && data.display_name) {
+            setLocation(data.display_name);
+          } else {
+            alert("Could not retrieve address.");
+          }
+        } catch (error) {
+          console.error("Error fetching location:", error);
+          alert("Failed to fetch address.");
+        }
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        alert("Unable to retrieve your location.");
+      }
+    );
+  };
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
@@ -63,8 +95,19 @@ const VolunteerRegistration = () => {
         <label className="block text-gray-700 font-medium mb-2">Your Location</label>
         <div className="flex items-center border border-gray-300 rounded-md px-3 py-2">
           <FaMapMarkerAlt className="text-gray-400 mr-2" />
-          <input type="text" placeholder="Enter location address" className="w-full outline-none bg-transparent" />
-          <button className="bg-gray-200 px-4 py-1 rounded-md text-gray-700 font-medium ml-2">Find</button>
+          <input
+            type="text"
+            placeholder="Enter location address"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            className="w-full outline-none bg-transparent"
+          />
+          <button
+            onClick={handleFindLocation}
+            className="bg-gray-200 px-4 py-1 rounded-md text-gray-700 font-medium ml-2"
+          >
+            Find
+          </button>
           <FaSearchLocation className="text-gray-400 ml-2 cursor-pointer" />
         </div>
         <p className="text-gray-500 text-sm mt-1">This helps us match you with nearby food donations.</p>
@@ -90,53 +133,52 @@ const VolunteerRegistration = () => {
         </div>
       </div>
 
-{/* Available Days and Time Slots */}
-{/* Available Days and Time Slots */}
-<div className="flex flex-col md:flex-row gap-8 mb-6">
-  {/* Available Days */}
-  <div className="flex-1">
-    <div className="flex items-start mb-3">
-      <FaRegCalendarAlt className="text-gray-600" />
-      <label className="text-gray-700 font-medium ml-2">Available Days</label>
-    </div>
-    <div className="flex flex-col items-start gap-2 text-left">
-      {days.map((day) => (
-        <div key={day} className="flex items-center w-full">
-          <input
-            type="checkbox"
-            id={day}
-            className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
-          />
-          <label htmlFor={day} className="ml-2 text-gray-700 w-full cursor-pointer">
-            {day}
-          </label>
+      {/* Available Days and Time Slots */}
+      <div className="flex flex-col md:flex-row gap-8 mb-6">
+        {/* Available Days */}
+        <div className="flex-1">
+          <div className="flex items-start mb-3">
+            <FaRegCalendarAlt className="text-gray-600" />
+            <label className="text-gray-700 font-medium ml-2">Available Days</label>
+          </div>
+          <div className="flex flex-col items-start gap-2 text-left">
+            {days.map((day) => (
+              <div key={day} className="flex items-center w-full">
+                <input
+                  type="checkbox"
+                  id={day}
+                  className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                />
+                <label htmlFor={day} className="ml-2 text-gray-700 w-full cursor-pointer">
+                  {day}
+                </label>
+              </div>
+            ))}
+          </div>
         </div>
-      ))}
-    </div>
-  </div>
 
-  {/* Available Time Slots */}
-  <div className="flex-1">
-    <div className="flex items-start  text-left mb-4">
-      <FaRegClock className="text-gray-600" />
-      <label className="text-gray-700 font-medium ">Available Time Slots</label>
-    </div>
-    <div className="flex flex-col items-start gap-2 text-left mb-20">
-      {timeSlots.map((slot) => (
-        <div key={slot} className="flex items-center w-full">
-          <input
-            type="checkbox"
-            id={slot}
-            className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
-          />
-          <label htmlFor={slot} className="ml-2 text-gray-700 w-full cursor-pointer">
-            {slot}
-          </label>
+        {/* Available Time Slots */}
+        <div className="flex-1">
+          <div className="flex items-start  text-left mb-4">
+            <FaRegClock className="text-gray-600" />
+            <label className="text-gray-700 font-medium ">Available Time Slots</label>
+          </div>
+          <div className="flex flex-col items-start gap-2 text-left mb-20">
+            {timeSlots.map((slot) => (
+              <div key={slot} className="flex items-center w-full">
+                <input
+                  type="checkbox"
+                  id={slot}
+                  className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                />
+                <label htmlFor={slot} className="ml-2 text-gray-700 w-full cursor-pointer">
+                  {slot}
+                </label>
+              </div>
+            ))}
+          </div>
         </div>
-      ))}
-    </div>
-  </div>
-</div>
+      </div>
 
       {/* Additional Information */}
       <div className="mt-6">

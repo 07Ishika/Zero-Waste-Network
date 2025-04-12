@@ -1,4 +1,5 @@
 import { FaFacebookF, FaTwitter, FaInstagram, FaEnvelope } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -12,7 +13,6 @@ const Footer = () => {
           <p className="mt-2 text-sm">
             Connecting surplus food with those in need, creating a sustainable solution to reduce waste and fight hunger.
           </p>
-          {/* Social Icons */}
           <div className="flex space-x-4 mt-4 text-gray-500">
             <a href="#" className="hover:text-green-600 cursor-pointer text-xl">
               <FaInstagram />
@@ -33,10 +33,10 @@ const Footer = () => {
         <div>
           <h3 className="font-bold">PLATFORM</h3>
           <ul className="mt-2 space-y-2 text-sm">
-            <li><a href="#" className="hover:text-green-600">Update Food</a></li>
-            <li><a href="#" className="hover:text-green-600">Volunteer</a></li>
-            <li><a href="#" className="hover:text-green-600">Organizations</a></li>
-            <li><a href="#" className="hover:text-green-600">Our Impact</a></li>
+            <li><Link to="/update" className="hover:text-green-600">Update Food</Link></li>
+            <li><Link to="/volunteer" className="hover:text-green-600">Volunteer</Link></li>
+            <li><Link to="/dashboard" className="hover:text-green-600">Dashboard</Link></li>
+            <li><Link to="/impact" className="hover:text-green-600">Our Impact</Link></li>
           </ul>
         </div>
 
@@ -44,10 +44,10 @@ const Footer = () => {
         <div>
           <h3 className="font-bold">RESOURCES</h3>
           <ul className="mt-2 space-y-2 text-sm">
-            <li><a href="#" className="hover:text-green-600">About Us</a></li>
-            <li><a href="#" className="hover:text-green-600">Blog</a></li>
-            <li><a href="#" className="hover:text-green-600">FAQ</a></li>
-            <li><a href="#" className="hover:text-green-600">Contact</a></li>
+            <li><Link to="/about" className="hover:text-green-600">About Us</Link></li>
+            <li><Link to="/blog" className="hover:text-green-600">Blog</Link></li>
+            <li><Link to="/faq" className="hover:text-green-600">FAQ</Link></li>
+            <li><Link to="/contact" className="hover:text-green-600">Contact</Link></li>
           </ul>
         </div>
 
@@ -55,14 +55,13 @@ const Footer = () => {
         <div>
           <h3 className="font-bold">LEGAL</h3>
           <ul className="mt-2 space-y-2 text-sm">
-            <li><a href="#" className="hover:text-green-600">Privacy Policy</a></li>
-            <li><a href="#" className="hover:text-green-600">Terms of Service</a></li>
-            <li><a href="#" className="hover:text-green-600">Cookie Policy</a></li>
+            <li><Link to="/privacy" className="hover:text-green-600">Privacy Policy</Link></li>
+            <li><Link to="/terms" className="hover:text-green-600">Terms of Service</Link></li>
+            <li><Link to="/cookies" className="hover:text-green-600">Cookie Policy</Link></li>
           </ul>
         </div>
       </div>
 
-      {/* Copyright */}
       <div className="text-center text-sm text-gray-500 mt-10">
         © 2025 WasteNot Connect. All rights reserved.
       </div>
