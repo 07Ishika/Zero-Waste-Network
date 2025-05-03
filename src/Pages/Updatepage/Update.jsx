@@ -31,6 +31,7 @@ const UpdateFoodForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === "phone" && !/^[0-9]*$/.test(value)) return;
     setFormData({ ...formData, [name]: value });
     setErrors({ ...errors, [name]: "" });
   };
@@ -47,12 +48,7 @@ const UpdateFoodForm = () => {
         `https://us1.locationiq.com/v1/reverse.php?key=${API_KEY}&lat=${lat}&lon=${lon}&format=json`
       );
       const data = await response.json();
-
-      if (data.display_name) {
-        return data.display_name;
-      } else {
-        return "Location not found";
-      }
+      return data.display_name || "Location not found";
     } catch (error) {
       console.error("Error fetching location:", error);
       return "Location not found";
@@ -98,11 +94,16 @@ const UpdateFoodForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const newErrors = {};
+
     Object.entries(formData).forEach(([key, value]) => {
       if (!value || (key === "image" && value === null)) {
         newErrors[key] = "This field is required";
       }
     });
+
+    if (formData.phone.length < 10) {
+      newErrors.phone = "Phone number must be at least 10 digits";
+    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -111,6 +112,23 @@ const UpdateFoodForm = () => {
 
     console.log("Form Submitted:", formData);
     setErrors({});
+  };
+
+  const handlePhoneKeyDown = (e) => {
+    // Block non-numeric key presses
+    if (
+      ["e", "E", "+", "-", ".", ","].includes(e.key) ||
+      (!/\d/.test(e.key) && e.key.length === 1 && !e.ctrlKey)
+    ) {
+      e.preventDefault();
+    }
+  };
+
+  const handlePhonePaste = (e) => {
+    const paste = e.clipboardData.getData("text");
+    if (!/^\d+$/.test(paste)) {
+      e.preventDefault();
+    }
   };
 
   return (
@@ -125,6 +143,7 @@ const UpdateFoodForm = () => {
           {/* Title & Servings */}
           <div className="grid grid-cols-2 gap-4">
             <div>
+            <label htmlFor="servings" className="block font-bold mb-1">Title</label>
               <input
                 ref={refs.title}
                 type="text"
@@ -138,6 +157,7 @@ const UpdateFoodForm = () => {
             </div>
 
             <div>
+            <label htmlFor="servings" className="block font-bold mb-1">Servings</label>
               <input
                 ref={refs.servings}
                 type="number"
@@ -152,9 +172,7 @@ const UpdateFoodForm = () => {
           </div>
 
           {/* Description */}
-          <label htmlFor="description" className="font-bold block mb-2">
-            Description
-          </label>
+          <label htmlFor="description" className="font-bold block mb-2">Description</label>
           <textarea
             ref={refs.description}
             name="description"
@@ -188,9 +206,7 @@ const UpdateFoodForm = () => {
           {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
 
           {/* Food Type & Expiry */}
-          <label htmlFor="foodType" className="font-bold block mb-2">
-            Food Type & Expires In
-          </label>
+          <label htmlFor="foodType" className="font-bold block mb-2">Food Type & Expires In</label>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <select
@@ -224,9 +240,7 @@ const UpdateFoodForm = () => {
           </div>
 
           {/* Image Upload */}
-          <label htmlFor="image" className="font-bold block mb-2">
-            Food Image
-          </label>
+          <label htmlFor="image" className="font-bold block mb-2">Food Image</label>
           <div className="border p-4 shadow-sm rounded-lg flex flex-col items-center">
             <label className="cursor-pointer">
               <FaUpload className="text-gray-500 text-2xl mb-2" />
@@ -236,7 +250,7 @@ const UpdateFoodForm = () => {
           </div>
           {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
 
-          {/* Food Safety Guidelines */}
+          {/* Guidelines */}
           <div className="p-4 border-l-4 border-yellow-500 bg-orange-100 text-sm text-gray-700 rounded-lg">
             🛑 Ensure food is properly packaged and hasn't been sitting at room temperature for more than 2 hours.
             High-risk foods (meat, dairy, prepared meals) should be refrigerated. Include any allergen information.
@@ -247,10 +261,14 @@ const UpdateFoodForm = () => {
             <div>
               <input
                 ref={refs.phone}
-                type="text"
+                type="tel"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
+                onKeyDown={handlePhoneKeyDown}
+                onPaste={handlePhonePaste}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 placeholder="Phone Number"
                 className={`w-full p-3 border shadow-sm rounded-lg focus:outline-green-500 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
               />
