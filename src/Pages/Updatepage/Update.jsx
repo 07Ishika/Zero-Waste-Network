@@ -101,8 +101,8 @@ const UpdateFoodForm = () => {
       }
     });
 
-    if (formData.phone.length < 10) {
-      newErrors.phone = "Phone number must be at least 10 digits";
+    if (formData.phone.length !== 10) {
+      newErrors.phone = "Phone number must be valid";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -143,7 +143,6 @@ const UpdateFoodForm = () => {
           {/* Title & Servings */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-            <label htmlFor="servings" className="block font-bold mb-1">Title</label>
               <input
                 ref={refs.title}
                 type="text"
@@ -157,7 +156,6 @@ const UpdateFoodForm = () => {
             </div>
 
             <div>
-            <label htmlFor="servings" className="block font-bold mb-1">Servings</label>
               <input
                 ref={refs.servings}
                 type="number"
@@ -269,6 +267,7 @@ const UpdateFoodForm = () => {
                 onPaste={handlePhonePaste}
                 inputMode="numeric"
                 pattern="[0-9]*"
+                maxLength={10} // Limiting phone number to 10 digits
                 placeholder="Phone Number"
                 className={`w-full p-3 border shadow-sm rounded-lg focus:outline-green-500 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
               />

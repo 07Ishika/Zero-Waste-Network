@@ -24,13 +24,13 @@ const VolunteerRegistration = () => {
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
   const [selectedTransport, setSelectedTransport] = useState(null);
-  const [step, setStep] = useState(1); // Track the current step (section) in the form
+  const [step, setStep] = useState(1);
 
   const [nameError, setNameError] = useState(false);
   const [phoneError, setPhoneError] = useState(false);
   const [transportError, setTransportError] = useState(false);
 
-  const [isAgreed, setIsAgreed] = useState(false); // Tracks whether the user has checked the agreement
+  const [isAgreed, setIsAgreed] = useState(false);
 
   const handleFindLocation = async () => {
     if (!navigator.geolocation) {
@@ -64,7 +64,6 @@ const VolunteerRegistration = () => {
   };
 
   const handleNextStep = () => {
-    // Step 1: Name and Phone validation
     if (step === 1) {
       if (!name) {
         setNameError(true);
@@ -75,7 +74,6 @@ const VolunteerRegistration = () => {
         return;
       }
     }
-    // Step 2: Location and Transport method validation
     if (step === 2) {
       if (!location) {
         alert("Please fill in your location.");
@@ -87,70 +85,60 @@ const VolunteerRegistration = () => {
       }
     }
 
-    setStep(step + 1); // Move to the next step
+    setStep(step + 1);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Reset all errors
     setNameError(false);
     setPhoneError(false);
     setTransportError(false);
 
     let isValid = true;
 
-    // Name validation
     if (!name) {
       setNameError(true);
       isValid = false;
     }
 
-    // Phone validation (must be numeric and have at least 10 digits)
     if (!phone || isNaN(phone) || phone.length < 10) {
       setPhoneError(true);
       isValid = false;
     }
 
-    // Transport method validation
     if (!selectedTransport) {
       setTransportError(true);
       isValid = false;
     }
 
-    // If form is valid, proceed with the submission
     if (isValid) {
       alert("Form Submitted!");
-      // Reset form and go back to step 1
       setName("");
       setPhone("");
       setLocation("");
       setSelectedTransport(null);
       setIsAgreed(false);
-      setStep(1); // Reset to the first step
+      setStep(1);
     }
   };
 
   const isSubmitDisabled = !name || !phone || !location || !selectedTransport || !isAgreed;
 
+  // ✅ Modified: Accept only 10 numeric digits
   const handlePhoneChange = (e) => {
     const value = e.target.value;
-
-    // Remove any non-numeric characters
-    const numericValue = value.replace(/[^0-9]/g, "");
-
-    setPhone(numericValue); // Update state with numeric only value
+    const numericValue = value.replace(/[^0-9]/g, "").slice(0, 10);
+    setPhone(numericValue);
   };
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
-      {/* Header */}
       <div className="flex items-center mb-6">
         <FaUser className="text-green-600 text-2xl mr-2" />
         <h2 className="text-2xl font-semibold">Volunteer Registration</h2>
       </div>
 
-      {/* Step 1: Name and Phone */}
       {step === 1 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div>
@@ -175,9 +163,9 @@ const VolunteerRegistration = () => {
                 type="text"
                 placeholder="Your phone number"
                 value={phone}
-                onChange={handlePhoneChange} // Update phone field to only accept numeric input
+                onChange={handlePhoneChange}
                 className={`w-full outline-none bg-transparent ${phoneError ? "border-red-500" : ""}`}
-                maxLength="15"
+                maxLength="10"
               />
             </div>
             {phoneError && (
@@ -189,7 +177,6 @@ const VolunteerRegistration = () => {
         </div>
       )}
 
-      {/* Step 2: Location and Transport Method */}
       {step === 2 && (
         <div className="mb-6">
           <label className="block text-gray-700 font-medium mb-2">Your Location</label>
@@ -212,7 +199,6 @@ const VolunteerRegistration = () => {
           </div>
           <p className="text-gray-500 text-sm mt-1">This helps us match you with nearby food donations.</p>
 
-          {/* Transportation Method */}
           <div className="mb-6">
             <label className="block text-gray-700 font-medium mb-2">Transportation Method</label>
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-4">
@@ -226,7 +212,7 @@ const VolunteerRegistration = () => {
                   }`}
                   onClick={() => {
                     setSelectedTransport(method.id);
-                    setTransportError(false); // Reset error when user selects an option
+                    setTransportError(false);
                   }}
                 >
                   <span className="mr-2">{method.icon}</span> {method.label}
@@ -238,7 +224,6 @@ const VolunteerRegistration = () => {
         </div>
       )}
 
-      {/* Step 3: Additional Information */}
       {step === 3 && (
         <div className="mt-6">
           <label className="block text-gray-700 font-medium mb-2">Additional Information (Optional)</label>
@@ -249,7 +234,6 @@ const VolunteerRegistration = () => {
         </div>
       )}
 
-      {/* Terms & Conditions */}
       {step === 3 && (
         <div className="mt-6 flex items-start">
           <input
@@ -264,7 +248,6 @@ const VolunteerRegistration = () => {
         </div>
       )}
 
-      {/* Navigation Buttons */}
       <div className="mt-6">
         {step < 3 ? (
           <button
@@ -276,7 +259,7 @@ const VolunteerRegistration = () => {
         ) : (
           <button
             onClick={handleSubmit}
-            disabled={isSubmitDisabled} // Disable the submit button if validation fails
+            disabled={isSubmitDisabled}
             className={`w-full py-3 rounded-lg font-semibold ${isSubmitDisabled ? "bg-gray-400" : "bg-green-600 text-white"}`}
           >
             Submit
