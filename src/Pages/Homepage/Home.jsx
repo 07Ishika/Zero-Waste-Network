@@ -1,7 +1,7 @@
 import React from "react";
 import { FaHeart } from "react-icons/fa"; // Top badge icon
 import { FiArrowRight } from "react-icons/fi"; // Button arrow icon
-import "./Home.css";
+import "./home.css";
 import { useNavigate } from "react-router-dom";
 import JoinUs from "./JoinUs";
 import SmartFeatures from "./Features";
