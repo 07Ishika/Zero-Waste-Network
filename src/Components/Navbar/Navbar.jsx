@@ -23,6 +23,8 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn"); // Remove login status
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
     setIsLoggedIn(false);
     navigate("/"); // Redirect to Home after logout
   };

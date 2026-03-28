@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FaUser,
   FaPhone,
@@ -20,13 +21,16 @@ const transportationMethods = [
 ];
 
 const VolunteerRegistration = () => {
+  const navigate = useNavigate();
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
   const [selectedTransport, setSelectedTransport] = useState(null);
   const [step, setStep] = useState(1);
 
   const [nameError, setNameError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
   const [phoneError, setPhoneError] = useState(false);
   const [transportError, setTransportError] = useState(false);
 
@@ -69,6 +73,10 @@ const VolunteerRegistration = () => {
         setNameError(true);
         return;
       }
+      if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+        setEmailError(true);
+        return;
+      }
       if (!phone || phone.length < 10) {
         setPhoneError(true);
         return;
@@ -88,10 +96,17 @@ const VolunteerRegistration = () => {
     setStep(step + 1);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!localStorage.getItem('token')) {
+      alert("Please login first to submit your volunteer application!");
+      navigate('/login');
+      return;
+    }
+
     setNameError(false);
+    setEmailError(false);
     setPhoneError(false);
     setTransportError(false);
 
@@ -99,6 +114,11 @@ const VolunteerRegistration = () => {
 
     if (!name) {
       setNameError(true);
+      isValid = false;
+    }
+
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      setEmailError(true);
       isValid = false;
     }
 
@@ -113,17 +133,41 @@ const VolunteerRegistration = () => {
     }
 
     if (isValid) {
-      alert("Form Submitted!");
-      setName("");
-      setPhone("");
-      setLocation("");
-      setSelectedTransport(null);
-      setIsAgreed(false);
-      setStep(1);
+      try {
+        const payload = {
+            name,
+            email,
+            phone,
+            area: location,
+            availability: "Flexible",
+            hasVehicle: selectedTransport === "bicycle" || selectedTransport === "motorcycle" || selectedTransport === "car"
+        };
+        const res = await fetch('http://localhost:5000/api/volunteer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error || 'Failed to register');
+        }
+        
+        alert("Volunteer Registered Successfully!");
+        setName("");
+        setEmail("");
+        setPhone("");
+        setLocation("");
+        setSelectedTransport(null);
+        setIsAgreed(false);
+        setStep(1);
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
     }
   };
 
-  const isSubmitDisabled = !name || !phone || !location || !selectedTransport || !isAgreed;
+  const isSubmitDisabled = !name || !email || !phone || !location || !selectedTransport || !isAgreed;
 
   // ✅ Modified: Accept only 10 numeric digits
   const handlePhoneChange = (e) => {
@@ -154,6 +198,20 @@ const VolunteerRegistration = () => {
               />
             </div>
             {nameError && <p className="text-red-500 mt-2">Name is required.</p>}
+          </div>
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">Email Address</label>
+            <div className="flex items-center border border-gray-300 rounded-md px-3 py-2">
+              <FaUser className="text-gray-400 mr-2" />
+              <input
+                type="email"
+                placeholder="Your email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={`w-full outline-none bg-transparent ${emailError ? "border-red-500" : ""}`}
+              />
+            </div>
+            {emailError && <p className="text-red-500 mt-2">Valid email is required.</p>}
           </div>
           <div>
             <label className="block text-gray-700 font-medium mb-1">Phone Number</label>

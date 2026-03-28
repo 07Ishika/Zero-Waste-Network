@@ -1,6 +1,6 @@
 import React from "react";
 import { FaLeaf } from "react-icons/fa";
-
+import { Link } from "react-router-dom";
 
 const CompostingNetwork = () => {
   return (
@@ -38,14 +38,12 @@ const CompostingNetwork = () => {
       </div>
 
       <div className="flex justify-center mt-8">
-  <a
-    href="https://docs.google.com/forms/d/1AJOo6qgxV1sC4qL5-Bcc04PRICx65QiGRVBo_7NN9XE/edit"  // <- replace with your actual Google Form URL
-    target="_blank"
-    rel="noopener noreferrer"
-    className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-full text-lg shadow text-center"
+  <Link
+    to="/composter-registration"
+    className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-full text-lg shadow text-center transition"
   >
     Apply to Join
-  </a>
+  </Link>
 </div>
     </div>
   

@@ -1,10 +1,13 @@
 import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaUpload, FaCheckCircle } from "react-icons/fa";
 import Footer from "../Homepage/Footer";
+import API from "../../api";
 
 const API_KEY = import.meta.env.VITE_LOCATIONIQ_API_KEY;
 
 const UpdateFoodForm = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     servings: "",
@@ -91,8 +94,17 @@ const UpdateFoodForm = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const [submitStatus, setSubmitStatus] = useState('')
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!localStorage.getItem('token')) {
+      alert("Please login first to submit a food donation!");
+      navigate('/login');
+      return;
+    }
+
     const newErrors = {};
 
     Object.entries(formData).forEach(([key, value]) => {
@@ -110,8 +122,18 @@ const UpdateFoodForm = () => {
       return;
     }
 
-    console.log("Form Submitted:", formData);
-    setErrors({});
+    try {
+      const data = new FormData()
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value !== null) data.append(key, value)
+      })
+      await API.post('/food', data, { headers: { 'Content-Type': 'multipart/form-data' } })
+      setSubmitStatus('✅ Food listing submitted successfully!')
+      setErrors({})
+      setFormData({ title: '', servings: '', description: '', location: '', foodType: '', expiresIn: '', phone: '', email: '', image: null })
+    } catch (err) {
+      setSubmitStatus('❌ ' + (err.response?.data?.error || 'Submission failed. Are you logged in?'))
+    }
   };
 
   const handlePhoneKeyDown = (e) => {
@@ -138,6 +160,11 @@ const UpdateFoodForm = () => {
         <p className="text-center text-gray-600 mb-6">
           Report food that would otherwise go to waste. Local volunteers will help distribute it to those in need.
         </p>
+        {submitStatus && (
+          <p className={`text-center mb-4 font-medium ${submitStatus.startsWith('✅') ? 'text-green-600' : 'text-red-500'}`}>
+            {submitStatus}
+          </p>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4" onBlur={validateAndFocus}>
           {/* Title & Servings */}
