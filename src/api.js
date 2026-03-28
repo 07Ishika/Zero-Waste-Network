@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API = axios.create({ baseURL: 'http://localhost:5000/api' })
+const API = axios.create({ baseURL: 'https://zero-waste-network-backend-p335.onrender.com/api' })
 
 // Attach JWT token to every request if available
 API.interceptors.request.use((req) => {
